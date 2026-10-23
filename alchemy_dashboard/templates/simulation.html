@@ -6,33 +6,34 @@
 <div class="simulation-content-area">
     <div class="simulation-config">
         <div class="card shadow-sm">
-            <div class="card-header p-0 bg-dark text-white d-flex align-items-center justify-content-start">
-
-                <div id="tab-fresh" class="py-3 px-4" onclick="switchTab('fresh')" style="cursor: pointer; background-color: rgba(255,255,255,0.1); opacity: 1; font-weight: bold;">
-                    <i></i> Fresh Simulation
-                </div>
-
-                <div style="width: 2px; height: 25px; background-color: rgba(255,255,255,0.3);"></div>
-
-                <div id="tab-recursive" class="py-3 px-4 text-warning" onclick="switchTab('recursive')" style="cursor: pointer; opacity: 0.5; font-weight: normal;">
-                    <i"></i> Recursive Simulation
-                </div>
-
+            <div class="card-header bg-dark text-white">
+                <h3 class="card-title">Run Simulation</h3>
             </div>
 
             <div class="card-body">
-                <div id="content-fresh">
-                    <form id="fresh-form" action="/run_simulation_form" method="POST" enctype="multipart/form-data">
-                        <input type="hidden" name="num_generations" value="1">
-
+                <form id="fresh-form" action="/run_simulation_form" method="POST" enctype="multipart/form-data">
+                    <div class="form-group mb-3">
+                        <label class="form-label fw-bold" for="recursive-parent-id">Seed from previous experiment (optional)</label>
+                        <select class="form-select form-control" name="recursive_parent_id" id="recursive-parent-id" aria-describedby="parent-help parent-load-status">
+                            <option value="">Start with a new population</option>
+                        </select>
+                        <div id="parent-help" class="form-text small">A previous experiment supplies its final population and random seed. Otherwise, configure a new population below.</div>
+                        <div id="parent-load-status" class="form-text small" role="status">Loading previous experiments...</div>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label class="form-label fw-bold">Experiment Name</label>
+                        <input class="form-control" type="text" name="experiment_name" placeholder="e.g. Random Genesis">
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 mb-3"><label class="form-label fw-bold">Collisions</label><input class="form-control" type="number" name="total_collisions" value="1000"></div>
+                        <div class="col-md-4 mb-3"><label class="form-label fw-bold">Polling</label><input class="form-control" type="number" name="polling_frequency" value="10"></div>
+                        <div class="col-md-4 mb-3"><label class="form-label fw-bold" for="num-generations">Generations</label><input class="form-control" type="number" name="num_generations" id="num-generations" value="1" min="1" required></div>
+                    </div>
+                    <fieldset id="fresh-options" style="border: 0; padding: 0; margin: 0; min-width: 0;">
+                        <legend class="form-label fw-bold">Initial population</legend>
                         <div class="form-group mb-3">
-                            <label class="form-label fw-bold">Experiment Name</label>
-                            <input class="form-control" type="text" name="experiment_name" placeholder="e.g. Random Genesis">
-                        </div>
-                        <div class="row">
-                            <div class="col-md-4 mb-3"><label class="form-label fw-bold">Collisions</label><input class="form-control" type="number" name="total_collisions" value="1000"></div>
-                            <div class="col-md-4 mb-3"><label class="form-label fw-bold">Polling</label><input class="form-control" type="number" name="polling_frequency" value="10"></div>
-                            <div class="col-md-4 mb-3"><label class="form-label fw-bold">Random Seed</label><input class="form-control" type="number" name="random_seed" value="42"></div>
+                            <label class="form-label fw-bold" for="random-seed">Random Seed</label>
+                            <input class="form-control" type="number" name="random_seed" id="random-seed" value="42">
                         </div>
                         <div class="form-group mb-3">
                             <label class="form-label fw-bold">Generator Type</label>
@@ -89,40 +90,10 @@
                             <div><label class="form-label small">Or Enter Directly</label><textarea class="form-control form-control-sm" name="direct_input" rows="3" placeholder="One expression per line"></textarea></div>
                         </div>
 
-                        <button type="submit" class="btn btn-success w-100 fw-bold"><i class="fas fa-play"></i> RUN FRESH SIMULATION</button>
-                    </form>
-                </div>
+                    </fieldset>
 
-                <div id="content-recursive" style="display: none;">
-                    <form id="recursive-form" action="/run_simulation_form" method="POST">
-                        <div class="form-group mb-3">
-                            <label class="form-label fw-bold">1. Select Parent Experiment</label>
-                            <select class="form-control border-warning" name="recursive_parent_id" id="recursive-parent-id" required>
-                                <option value="">-- Loading... --</option>
-                            </select>
-                            <div class="form-text small">Inherits <strong>Final Survivors</strong> and <strong>Random Seed</strong>.</div>
-                        </div>
-                        <div class="form-group mb-3">
-                            <label class="form-label fw-bold">2. Experiment Base Name</label>
-                            <input type="text" class="form-control" name="experiment_name" placeholder="e.g. Recursive Experiment #1">
-                        </div>
-                        <div class="row">
-                            <div class="col-md-4 mb-3">
-                                <label class="form-label fw-bold text-primary">Generations</label>
-                                <input type="number" class="form-control border-primary" name="num_generations" value="2" min="1">
-                            </div>
-                            <div class="col-md-4 mb-3">
-                                <label class="form-label fw-bold">Collisions</label>
-                                <input type="number" class="form-control" name="total_collisions" value="1000">
-                            </div>
-                            <div class="col-md-4 mb-3">
-                                <label class="form-label fw-bold">Polling</label>
-                                <input type="number" class="form-control" name="polling_frequency" value="10">
-                            </div>
-                        </div>
-                        <button type="submit" class="btn btn-warning w-100 fw-bold shadow-sm"><i class="fas fa-sitemap"></i> INITIATE RECURSION</button>
-                    </form>
-                </div>
+                    <button type="submit" class="btn btn-success w-100 fw-bold"><i class="fas fa-play"></i> RUN SIMULATION</button>
+                </form>
 
             </div>
         </div>
@@ -191,37 +162,8 @@
 
 {% block scripts %}
 <script>
-    // --- Tab Switcher Logic ---
-    // --- Tab Switcher Logic ---
-    function switchTab(tabName) {
-        const tabFresh = document.getElementById('tab-fresh');
-        const tabRecursive = document.getElementById('tab-recursive');
-
-        // 1. Reset both tabs to "Inactive" (Faded & Normal font weight)
-        tabFresh.style.backgroundColor = "transparent";
-        tabFresh.style.opacity = "0.5";
-        tabFresh.style.fontWeight = "normal";
-
-        tabRecursive.style.backgroundColor = "transparent";
-        tabRecursive.style.opacity = "0.5";
-        tabRecursive.style.fontWeight = "normal";
-
-        // 2. Hide all content
-        document.getElementById('content-fresh').style.display = "none";
-        document.getElementById('content-recursive').style.display = "none";
-
-        // 3. Set the clicked tab to "Active" (Lit up & Bold)
-        const activeTab = document.getElementById('tab-' + tabName);
-        activeTab.style.backgroundColor = "rgba(255,255,255,0.1)";
-        activeTab.style.opacity = "1";
-        activeTab.style.fontWeight = "bold";
-
-        // 4. Show the selected content
-        document.getElementById('content-' + tabName).style.display = "block";
-    }
-
     document.addEventListener("DOMContentLoaded", function () {
-        // --- Generator Toggles (Fresh Tab) ---
+        // --- Generator Toggles ---
         const generatorSelect = document.getElementById('generator-type');
         function toggleGeneratorOptions() {
             document.getElementById('from-file-options').style.display = 'none';
@@ -236,21 +178,37 @@
         generatorSelect.addEventListener('change', toggleGeneratorOptions);
         toggleGeneratorOptions();
 
-        // --- Populate Recursive Dropdown ---
+        // --- Optional Previous Experiment ---
         const parentSelect = document.getElementById('recursive-parent-id');
+        const freshOptions = document.getElementById('fresh-options');
+        const parentLoadStatus = document.getElementById('parent-load-status');
+        function toggleInitialPopulation() {
+            const hasParent = parentSelect.value !== '';
+            freshOptions.hidden = hasParent;
+            freshOptions.disabled = hasParent;
+        }
+        parentSelect.addEventListener('change', toggleInitialPopulation);
+        toggleInitialPopulation();
+
         fetch('/list_experiments')
-            .then(res => res.json())
+            .then(res => {
+                if (!res.ok) throw new Error('Could not load previous experiments');
+                return res.json();
+            })
             .then(data => {
-                parentSelect.innerHTML = '<option value="">-- Choose an Experiment to Evolve --</option>';
                 data.experiments.forEach(exp => {
                     const opt = document.createElement('option');
                     opt.value = exp.config_id;
                     opt.textContent = `${exp.name || 'Exp ' + exp.config_id} (Seed: ${exp.random_seed})`;
                     parentSelect.appendChild(opt);
                 });
+                parentLoadStatus.textContent = data.experiments.length ? '' : 'No previous experiments are available.';
+            })
+            .catch(() => {
+                parentLoadStatus.textContent = 'Previous experiments could not be loaded. You can still start a new population.';
             });
 
-        // --- Form Submission Handler (Handles Both Tabs) ---
+        // --- Form Submission Handler ---
         function handleSimulationSubmit(e) {
             e.preventDefault();
 
@@ -266,7 +224,7 @@
 
             fetch(this.action, {
                 method: 'POST',
-                body: new FormData(this) // Pulls data from whichever form triggered the event
+                body: new FormData(this)
             })
                 .then(response => response.json())
                 .then(data => {
@@ -296,7 +254,6 @@
         }
 
         document.getElementById('fresh-form').addEventListener('submit', handleSimulationSubmit);
-        document.getElementById('recursive-form').addEventListener('submit', handleSimulationSubmit);
     });
 </script>
-{% endblock %} 
+{% endblock %}
