@@ -276,12 +276,17 @@
                         status.innerHTML = '<i class="fas fa-check-circle"></i> Simulation Complete!';
                         status.style.display = 'block';
                     } else {
-                        alert("Error: " + data.message);
+                        status.className = 'simulation-status error';
+                        status.textContent = 'Simulation reported an error. Check experiment history before retrying.';
                         status.style.display = 'block';
+                        alert("Error: " + data.message);
                     }
                 })
                 .catch(error => {
                     loader.style.display = 'none';
+                    status.className = 'simulation-status error';
+                    status.textContent = 'Could not confirm the simulation result. Check experiment history before retrying.';
+                    status.style.display = 'block';
                     alert('Server error occurred.');
                     console.error(error);
                 })
