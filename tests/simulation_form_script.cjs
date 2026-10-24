@@ -39,7 +39,8 @@ async function load({experiments = [{config_id: 17, name: 'Prior <run>', random_
     nodes['generator-type'].value = 'Fontana';
     const posts = [];
     const alerts = [];
-    let response = {status: 'success', config_id: 18, experiment_name: 'New run', message: 'Done'};
+    let response = {status: 'success', config_id: 18, experiment_name: 'New run', message: 'Done',
+                    generator_type: 'from_file', total_collisions: 0, population_size: 4};
     const document = {
         getElementById(id) { return nodes[id] || null; },
         createElement() { return element(); },

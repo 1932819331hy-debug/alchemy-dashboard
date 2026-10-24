@@ -1489,6 +1489,9 @@ def run_simulation_form():
                 "status": "success",
                 "config_id": last_config_id,
                 "experiment_name": exp_name,
+                "generator_type": generator_type,
+                "total_collisions": total_collisions,
+                "population_size": len(results[-1]["final_expressions"]),
                 "message": f"Successfully ran {num_generations} generation(s).",
             }
         )

@@ -102,7 +102,7 @@
 
                     </fieldset>
 
-                    <button type="submit" class="btn btn-success w-100 fw-bold"><i class="fas fa-play"></i> RUN SIMULATION</button>
+                    <button id="run-simulation-button" type="submit" class="btn btn-success w-100 fw-bold"><i class="fas fa-play"></i> RUN SIMULATION</button>
                 </form>
 
             </div>
@@ -141,15 +141,15 @@
                 <div id="simulation-summary" class="simulation-summary" style="display: none;">
                     <div class="summary-item">
                         <span class="summary-label">Generator:</span>
-                        <span class="summary-value" id="summary-generator">Fontana</span>
+                        <span class="summary-value" id="summary-generator"></span>
                     </div>
                     <div class="summary-item">
-                        <span class="summary-label">Collisions:</span>
-                        <span class="summary-value" id="summary-collisions">1,000</span>
+                        <span class="summary-label">Collisions / generation:</span>
+                        <span class="summary-value" id="summary-collisions"></span>
                     </div>
                     <div class="summary-item" data-summary="expressions">
                         <span class="summary-label">Expressions:</span>
-                        <span class="summary-value" id="summary-expressions">25</span>
+                        <span class="summary-value" id="summary-expressions"></span>
                     </div>
                     <div class="summary-item">
                         <span class="summary-label">Name:</span>
@@ -235,8 +235,13 @@
             });
 
         // --- Form Submission Handler ---
+        let submitting = false;
+        const submitButton = document.getElementById('run-simulation-button');
         function handleSimulationSubmit(e) {
             e.preventDefault();
+            if (submitting) return;
+            submitting = true;
+            submitButton.disabled = true;
 
             const status = document.getElementById('simulation-status');
             const loader = document.getElementById('loading-indicator');
@@ -260,6 +265,9 @@
                         successMessage.style.display = 'block';
 
                         document.getElementById('summary-name').textContent = data.experiment_name;
+                        document.getElementById('summary-generator').textContent = data.generator_type === 'from_file' ? 'Supplied population' : data.generator_type;
+                        document.getElementById('summary-collisions').textContent = Number(data.total_collisions).toLocaleString();
+                        document.getElementById('summary-expressions').textContent = Number(data.population_size).toLocaleString();
                         document.getElementById('view-experiment-link').href = '/view_experiment/' + data.config_id;
                         document.getElementById('view-experiment-link').style.display = 'inline-block';
                         summary.style.display = 'block';
@@ -276,6 +284,10 @@
                     loader.style.display = 'none';
                     alert('Server error occurred.');
                     console.error(error);
+                })
+                .finally(() => {
+                    submitting = false;
+                    submitButton.disabled = false;
                 });
         }
 
