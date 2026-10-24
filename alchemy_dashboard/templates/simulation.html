@@ -29,6 +29,16 @@
                         <div class="col-md-4 mb-3"><label class="form-label fw-bold">Polling</label><input class="form-control" type="number" name="polling_frequency" value="10"></div>
                         <div class="col-md-4 mb-3"><label class="form-label fw-bold" for="num-generations">Generations</label><input class="form-control" type="number" name="num_generations" id="num-generations" value="1" min="1" required></div>
                     </div>
+                    <div class="form-group mb-3">
+                        <label class="form-label fw-bold" for="wipeout-percent">Wipeout between generations (%)</label>
+                        <input class="form-control" type="number" name="wipeout_percent" id="wipeout-percent" value="0" min="0" max="100" step="1" required>
+                        <div class="form-text small">Rust removes this percentage (rounded down) and refills before the next generation. Fresh generated runs reuse the selected generator.</div>
+                    </div>
+                    <div id="refill-options" class="form-group mb-3" hidden>
+                        <label class="form-label fw-bold" for="refill-expression">Refill expression for parent/manual populations</label>
+                        <input class="form-control" type="text" name="repopulation_expression" id="refill-expression" placeholder="Example: \x.\y.x y" disabled>
+                        <div class="form-text small">Required when wipeout is nonzero for a parent or supplied population. Each removed expression is replaced by a copy of your chosen expression; no example is applied automatically.</div>
+                    </div>
                     <fieldset id="fresh-options" style="border: 0; padding: 0; margin: 0; min-width: 0;">
                         <legend class="form-label fw-bold">Initial population</legend>
                         <div class="form-group mb-3">
@@ -189,6 +199,22 @@
         }
         parentSelect.addEventListener('change', toggleInitialPopulation);
         toggleInitialPopulation();
+
+        // A supplied population has no refill generator; require an explicit choice.
+        const wipeoutInput = document.getElementById('wipeout-percent');
+        const refillOptions = document.getElementById('refill-options');
+        const refillInput = document.getElementById('refill-expression');
+        function toggleRefillOptions() {
+            const suppliedPopulation = parentSelect.value !== '' || generatorSelect.value === 'from_file';
+            const needsRefill = suppliedPopulation && Number(wipeoutInput.value) > 0;
+            refillOptions.hidden = !needsRefill;
+            refillInput.disabled = !needsRefill;
+            refillInput.required = needsRefill;
+        }
+        wipeoutInput.addEventListener('input', toggleRefillOptions);
+        parentSelect.addEventListener('change', toggleRefillOptions);
+        generatorSelect.addEventListener('change', toggleRefillOptions);
+        toggleRefillOptions();
 
         fetch('/list_experiments')
             .then(res => {

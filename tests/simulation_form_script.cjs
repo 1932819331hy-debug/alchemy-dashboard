@@ -98,6 +98,31 @@ async function load({experiments = [{config_id: 17, name: 'Prior <run>', random_
     assert.equal(app.nodes['generator-type'].value, 'from_file', 'returning to fresh preserves values');
     passed++;
 
+    const wipeout = app.nodes['wipeout-percent'];
+    const refill = app.nodes['refill-expression'];
+    const refillOptions = app.nodes['refill-options'];
+    assert.ok(wipeout && refill && refillOptions, 'wipeout and explicit refill controls exist');
+    assert.equal(refill.value, '', 'no refill expression is silently chosen');
+    assert.equal(refill.disabled, true);
+    wipeout.value = '25';
+    wipeout.dispatch('input');
+    assert.equal(refillOptions.hidden, false);
+    assert.equal(refill.disabled, false);
+    assert.equal(refill.required, true, 'manual populations need explicit refill with wipeout');
+    app.nodes['generator-type'].value = 'BTree';
+    app.nodes['generator-type'].dispatch('change');
+    assert.equal(refill.disabled, true, 'fresh generated runs use the configured generator');
+    parent.value = '17';
+    parent.dispatch('change');
+    assert.equal(refill.disabled, false, 'parent populations need explicit refill despite disabled fresh options');
+    wipeout.value = '0';
+    wipeout.dispatch('input');
+    assert.equal(refill.disabled, true);
+    assert.equal(refill.required, false);
+    parent.value = '';
+    parent.dispatch('change');
+    passed++;
+
     assert.equal(parent.children.length, 1);
     assert.equal(parent.children[0].value, 17);
     assert.equal(parent.children[0].textContent, 'Prior <run> (Seed: 93)');

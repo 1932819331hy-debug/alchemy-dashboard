@@ -66,6 +66,7 @@ class SimulationFormTests(unittest.TestCase):
         self.assertEqual(set(names), {
             "experiment_name", "total_collisions", "polling_frequency",
             "num_generations", "recursive_parent_id", "random_seed",
+            "wipeout_percent", "repopulation_expression",
             "generator_type", "btree_size", "freevar_probability", "max_free_vars",
             "standardization", "num_expressions", "abs_low", "abs_high",
             "app_low", "app_high", "min_depth", "max_depth",
@@ -98,7 +99,7 @@ class SimulationFormTests(unittest.TestCase):
                      "btree_size", "abs_low", "fontana_expression_count"):
             self.assertIn(group, self.controls(name)[0]["parents"])
         for name in ("num_generations", "recursive_parent_id", "total_collisions",
-                     "polling_frequency", "experiment_name"):
+                     "polling_frequency", "experiment_name", "wipeout_percent", "repopulation_expression"):
             self.assertNotIn(group, self.controls(name)[0]["parents"])
 
     def test_original_generators_and_file_controls_remain_available(self):
@@ -113,6 +114,17 @@ class SimulationFormTests(unittest.TestCase):
                             "fontana_expression_count": "10"}.items():
             self.assertEqual(self.controls(name)[0]["attrs"]["value"], value)
 
+    def test_wipeout_and_explicit_refill_have_safe_defaults(self):
+        wipeout = self.controls("wipeout_percent")
+        self.assertEqual(len(wipeout), 1)
+        self.assertEqual(wipeout[0]["attrs"]["value"], "0")
+        self.assertEqual(wipeout[0]["attrs"]["min"], "0")
+        self.assertEqual(wipeout[0]["attrs"]["max"], "100")
+        refill = self.controls("repopulation_expression")
+        self.assertEqual(len(refill), 1)
+        self.assertEqual(refill[0]["attrs"].get("value", ""), "")
+        self.assertIn("placeholder", refill[0]["attrs"])
+
     def test_script_contracts(self):
         # This runs the real inline script in Node with explicit DOM/fetch doubles.
         # It does not prove DOM rendering, browser FormData, or server behavior.
@@ -122,7 +134,7 @@ class SimulationFormTests(unittest.TestCase):
         )
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         report = json.loads(result.stdout)
-        self.assertEqual(report["passed"], 7)
+        self.assertEqual(report["passed"], 8)
 
 
 if __name__ == "__main__":
